@@ -1,20 +1,28 @@
 package com.sciopsh.bikes.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Document
 public class Bike {
-    private long id;
+    private String id;
+    @NotNull(message = "Bike name is mandatory")
     private String name;
     private String description;
     private int price;
     private String manufacturer;
+    @Valid
     private List<Item> items;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

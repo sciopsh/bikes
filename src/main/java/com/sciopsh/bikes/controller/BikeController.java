@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sciopsh.bikes.model.Bike;
 import com.sciopsh.bikes.model.Item;
+import com.sciopsh.bikes.repository.BikeRepository;
 import org.apache.catalina.mapper.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,28 +20,17 @@ import java.util.Map;
 @RequestMapping("/api/bikes")
 public class BikeController {
 
-    Map<Long, Bike> bikes = new HashMap<>();
-    long consecutive = 0L;
-    long itemConsecutive = 0L;
+    @Autowired
+    BikeRepository repository;
 
     @PostMapping(consumes = "application/json")
-    public String createBike(@RequestBody Bike bike) {
-        //TODO
-        for(Item item : bike.getItems()) {
-            item.setId(itemConsecutive++);
-        }
-        bike.setId(consecutive);
-        bikes.put(consecutive, bike);
-        return "" + consecutive++;
+    public Bike createBike(@RequestBody @Valid Bike bike) {
+        return repository.save(bike);
     }
 
     @GetMapping(path = "{id}")
-    public String getBike(@PathVariable long id) {
-        try {
-            return new ObjectMapper().writeValueAsString(bikes.get(id));
-        } catch (Exception e) {
-            return "not found";
-        }
+    public Bike getBike(@PathVariable String id) {
+        return repository.findById(id).orElse(null);
     }
 
     @GetMapping(path = "search")

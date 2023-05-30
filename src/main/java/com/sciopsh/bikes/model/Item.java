@@ -1,16 +1,26 @@
 package com.sciopsh.bikes.model;
 
+import org.bson.types.ObjectId;
+
+import javax.validation.constraints.NotNull;
+
 public class Item {
-    private long id;
+    private String id;
+    @NotNull(message = "Item model is mandatory")
     private String model;
+    @NotNull(message = "Item type is mandatory")
     private String type;
     private String description;
 
-    public long getId() {
+    public Item() {
+        this.id = new ObjectId().toString();
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
