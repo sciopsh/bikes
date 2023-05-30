@@ -29,17 +29,7 @@ public class BikeController {
     public List<Bike> searchBikes(@RequestParam String filterKey, @RequestParam String filterValue,
                                   @RequestParam(required = false) String order) {
 
-        Sort.Order sortOrder = new Sort.Order(Sort.DEFAULT_DIRECTION, "name");
-        switch (order) {
-            case "asc":
-            case "ascending":
-                sortOrder = new Sort.Order(Sort.Direction.ASC, "name");
-                break;
-            case "desc":
-            case "descending":
-                sortOrder = new Sort.Order(Sort.Direction.DESC, "name");
-                break;
-        }
+        Sort.Order sortOrder = getSortOrder(order);
 
         switch (filterKey.toLowerCase()) {
             case "name":
@@ -62,4 +52,25 @@ public class BikeController {
         return repository.findById(id).orElse(null);
     }
 
+    private static Sort.Order getSortOrder(String order) {
+
+        Sort.Order sortOrder = new Sort.Order(Sort.DEFAULT_DIRECTION, "name");
+        if(order == null || order.length() == 0) {
+            return sortOrder;
+        }
+
+        switch (order.toLowerCase()) {
+            case "asc":
+            case "ascending":
+                sortOrder = new Sort.Order(Sort.Direction.ASC, "name");
+                break;
+            case "desc":
+            case "descending":
+                sortOrder = new Sort.Order(Sort.Direction.DESC, "name");
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal filters");
+        }
+        return sortOrder;
+    }
 }
