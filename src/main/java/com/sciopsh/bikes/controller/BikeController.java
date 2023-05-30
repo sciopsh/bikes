@@ -1,20 +1,13 @@
 package com.sciopsh.bikes.controller;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sciopsh.bikes.model.Bike;
-import com.sciopsh.bikes.model.Item;
 import com.sciopsh.bikes.repository.BikeRepository;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bikes")
@@ -28,18 +21,40 @@ public class BikeController {
         return repository.save(bike);
     }
 
+    @GetMapping(path = "search")
+    public List<Bike> searchBikes(@RequestParam String filterKey, @RequestParam String filterValue,
+                                  @RequestParam(required = false) String order) {
+
+        Sort.Order sortOrder = new Sort.Order(Sort.DEFAULT_DIRECTION, "name");
+        switch (order) {
+            case "asc":
+            case "ascending":
+                sortOrder = new Sort.Order(Sort.Direction.ASC, "name");
+                break;
+            case "desc":
+            case "descending":
+                sortOrder = new Sort.Order(Sort.Direction.DESC, "name");
+                break;
+        }
+
+        switch (filterKey.toLowerCase()) {
+            case "name":
+            case "bike.name":
+                return repository.findAllByName(filterValue, Sort.by(sortOrder));
+            case "manufacturer":
+            case "bike.manufacturer":
+                return repository.findAllByManufacturer(filterValue, Sort.by(sortOrder));
+            case "type":
+            case "item.type":
+                return repository.findAllByItems(filterValue, Sort.by(sortOrder));
+            default:
+                throw new IllegalArgumentException("Illegal filters");
+        }
+    }
+
     @GetMapping(path = "{id}")
     public Bike getBike(@PathVariable String id) {
         return repository.findById(id).orElse(null);
     }
 
-    @GetMapping(path = "search")
-    public String searchBikes(@RequestParam String q,
-                              @RequestParam(required = false) String filterKey,
-                              @RequestParam(required = false) String filterValue,
-                              @RequestParam(required = false) String order) {
-        //TODO
-        return String.format("Your query was: q=%s,filterKey=%s,filterValue=%s,order=%s",
-                q, filterKey, filterValue, order);
-    }
 }
