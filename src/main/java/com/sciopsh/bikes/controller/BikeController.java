@@ -3,6 +3,8 @@ package com.sciopsh.bikes.controller;
 import com.sciopsh.bikes.model.Bike;
 import com.sciopsh.bikes.repository.BikeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +19,13 @@ public class BikeController {
     BikeRepository repository;
 
     @PostMapping(consumes = "application/json")
+    @CacheEvict("bikeSearch")
     public Bike createBike(@RequestBody @Valid Bike bike) {
         return repository.save(bike);
     }
 
     @GetMapping(path = "search")
+    @Cacheable("bikeSearch")
     public List<Bike> searchBikes(@RequestParam String filterKey, @RequestParam String filterValue,
                                   @RequestParam(required = false) String order) {
 
@@ -53,6 +57,7 @@ public class BikeController {
     }
 
     @GetMapping(path = "{id}")
+    @Cacheable("bikes")
     public Bike getBike(@PathVariable String id) {
         return repository.findById(id).orElse(null);
     }
