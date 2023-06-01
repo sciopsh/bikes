@@ -4,9 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### I need it for the docker idk ###
-!target/*.jar
-
 ### STS ###
 .apt_generated
 .classpath
