@@ -1,16 +1,10 @@
 version: '3.8'
 services:
-  build:
+  app:
+    container_name: "app"
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - ./target:/app/target
-    command: mvn clean package -DskipTests
-  app:
-    container_name: "app"
-    image:
-      openjdk:11
     ports:
       - 8081:8081
     volumes:
@@ -18,7 +12,6 @@ services:
     entrypoint:
       ["java","-jar","/tmp/app.jar"]
     depends_on:
-      - build
       - db
       - keycloak
   db:
